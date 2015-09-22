@@ -1,0 +1,34 @@
+Guide für das Robustness Programm basierend auf Sebastians Programm
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Notiz: Andreas will mir noch zeigen wie man den Dateien-Wust besser verwalten kann... Momentan hab ich noch alle Files einzeln im Ordner liegen leider
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Das Programm (main.c) ist im Prinzip in drei Teile aufgeteilt
+
+  (1) SetNicheNetwork: Aufstellen des Nischennetzes (mignicheweb.c bzw. .h)
+  (2) EvolveNetwork: Die Populationsdynamik ausrechnen (evolveweb.c bzw. .h)
+  (3) EvaluateRobustness: Die Daten auswählen, die in den Output sollen (robustness.c bzw. .h)
+  
+  Diese drei Schritte waren vorher in der Niche_Calc Funktion vereint.
+  
+Das hat den Vorteil, dass Änderungen, z.B. ein anderes Modell oder eine andere Auswertung, nur in der entsprechenden Datei vorgenommen werden müssen (plus Übergabeänderungen).  
+
+Diese drei Schritte werden L mal ausgeführt und die Ergebnisse gemittelt.
+Danach werden die Dateien in den Ordner ORT geschrieben analog zu Sebastians Notation.
+
+Neu sind die Datenstrukturen 'struct foodweb' und 'struct resource' im Headerfile structs.h. Sie sorgen dafür, dass in allen Funktionen auf die Parameter des Netzwerkes/der Resource 
+zugegriffen werden kann, mit foodwebname.attribut bzw. falls es einen Pointer auf die Struktur gibt mit (&foodwebname)->attribut. Die get_args Funktion liest die Parameter wie gewohnt ein, 
+speichert sie aber in den Attributen der Struktur, so dass sie im kompletten Programmverlauf zur Verfügung stehen und nicht übergeben werden müssen, solange die Struktur 
+der Funktion bekannt ist.
+
+Die Liste der Parameter der Struktur kann beliebig erweitert werden, solange dann im Hauptprogramm richtig initialisiert wird.
+
+
+Änderungen: 
+
+- M wird nun mit 0 oder 1 gekennzeichnet; 0 ist linkwise; 1 ist patchwise
+- Die Berechnung der BEF wurde eingebaut --> alpha ist zusätzliche Eingabevariable
+
+
