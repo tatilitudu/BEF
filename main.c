@@ -109,6 +109,13 @@ int main(int argc, char** argv)
 
 	gsl_vector *populationFIN 	= gsl_vector_calloc((nicheweb.Rnum + nicheweb.S)*(nicheweb.Y)*5 + (nicheweb.S) + 4*nicheweb.Y);				// Gleiche Länge wie Rückgabe von evolveNetwork
 	gsl_vector *robustness		= gsl_vector_calloc(67);
+	gsl_vector *robustnesstemp	= gsl_vector_calloc(67);
+	gsl_vector *meanOfDataSqu	= gsl_vector_calloc(67);
+	gsl_vector *meanSquOfData	= gsl_vector_calloc(67);
+	gsl_vector *meanSquOfDatatemp	= gsl_vector_calloc(67);
+	gsl_vector *standardDerivation	= gsl_vector_calloc(67);
+	gsl_vector_set_zero(robustness);
+	gsl_vector_set_zero(meanSquOfData);
 
 	for(i = 0; i < L; i++)																							
 	 { 			
@@ -121,13 +128,39 @@ int main(int argc, char** argv)
 		// for(j=0; j<len; j++)printf("Netzwerk %i: %f", j, gsl_vector_get(nicheweb.network, j));
  	    // gsl_vector_add(populationFIN, EvolveNetwork(nicheweb));		
 												
-		gsl_vector_add(robustness, EvaluateRobustness(populationFIN, nicheweb.Rnum, nicheweb.S, nicheweb.Y));	// Robustness Analyse
+		gsl_vector_memcpy(robustnesstemp, EvaluateRobustness(populationFIN, nicheweb.Rnum, nicheweb.S, nicheweb.Y));	// Robustness Analyse
 
+		gsl_vector_add(robustness,robustnesstemp);
+		
+		gsl_vector_memcpy(meanSquOfDatatemp,robustnesstemp);
+		gsl_vector_mul(meanSquOfDatatemp,robustnesstemp);
+		gsl_vector_add(meanSquOfData,meanSquOfDatatemp);
+		
 		printf("\nBeende Durchlauf L = %i\n", i);
 	 }
 	
 	printf("L=%i\tspeciesini=%f\tspeciesfinal=%f\n", L, gsl_vector_get(robustness, 3)/L, gsl_vector_get(robustness, 9)/L);
 
+//--Standardabweichung berechnen------------------------------------------------------------------------------------
+	
+	
+	gsl_vector_memcpy(meanOfDataSqu,robustness);
+	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	gsl_vector_mul(meanOfDataSqu,robustness);
+	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	
+	for(i =0; i<67; i++)
+	{
+	  gsl_vector_set(meanOfDataSqu, i, gsl_vector_get(meanOfDataSqu,i)/(L*L));
+	  gsl_vector_set(meanSquOfData, i, gsl_vector_get(meanSquOfData,i)/L);
+	  gsl_vector_set(standardDerivation, i, sqrt(gsl_vector_get(meanSquOfData,i)-gsl_vector_get(meanOfDataSqu,i)));
+	}
+	
+	printf("S ist %f\n", gsl_vector_get(robustness,3));
+	printf("Standardabweichung von S ist %f\n", gsl_vector_get(standardDerivation,3));
+	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	printf("meanSquOfData ist %f\n", gsl_vector_get(meanSquOfData,3));
+	
 //--Abspeichern in File-------------------------------------------------------------------------------------	
 	
 	FILE *statistics;				// neuer FILE pointer
@@ -172,6 +205,32 @@ int main(int argc, char** argv)
     fprintf(statistics,"%5.3f\t", nicheweb.alpha);
 
     fprintf(statistics,"\n");
+    
+//--Standardabweichungen in die Datei (dritte Zeile) schreiben---------------------------------------------------------------    
+    for(i= 0 ; i< 8; i++)
+    {
+      fprintf(statistics, "%d\t", 0);
+    }
+    
+    for(i = 0 ; i<51; i++)
+    {
+      fprintf(statistics,"%5.1f\t", gsl_vector_get(standardDerivation, i));
+    }
+    
+    for(i=51; i<62; i++)	//1mit2... Fixp1...7
+    {
+	fprintf(statistics,"n.b.\t");
+    }
+
+    for(i=62; i<67; i++)	//Rob2 -> regio 
+    {
+        fprintf(statistics,"%5.3f\t", gsl_vector_get(standardDerivation, i));
+    }
+    
+    fprintf(statistics, "%d\t", 0);
+    
+    fprintf(statistics,"\n");
+    
     fclose(statistics);															// Datei schließen
 
 	printf("Simulation abgespeichert\n");

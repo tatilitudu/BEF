@@ -107,7 +107,7 @@ int getArgs(int argc, char** argv, int* S_value, int* B_value, int* T_value, dou
 					
 		case 'a':	*alpha_value = atof(argv[++i]);
 					alpha_check = 1;
-					printf("alpha gesetzt auf %f \n", *alpha_value);
+					printf("alpha vorübergehend gesetzt auf %f \n", *alpha_value);
 					break;
 
 		case 'R':	*R_value = atof(argv[++i]);

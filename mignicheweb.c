@@ -476,7 +476,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 	  }
 	  
 	printf("Nischenwerte im Netzwerk\n"); 
-	printf("\nNetzwerkkomponenten zusammen gesetzt. Insgesamt %i Elemente\n\n", index);
+	printf("\nNetzwerkkomponenten zusammengesetzt. Insgesamt %i Elemente\n\n", index);
 	
 return result;
  

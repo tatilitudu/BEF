@@ -54,8 +54,8 @@ gsl_vector* EvolveNetwork(struct foodweb nicheweb)
 	gsl_vector *ymax	= gsl_vector_calloc((Rnum+S)*Y);						// Maximalwerte nach t2
 	gsl_vector *ymin	= gsl_vector_calloc((Rnum+S)*Y);						// Minimalwerte nach t2
 	gsl_vector *yavg	= gsl_vector_calloc((Rnum+S)*Y);						// Durchschnittswert nach t2
-	gsl_vector *ytest	= gsl_vector_calloc((Rnum+S)*Y);
-	gsl_vector *ytest2	= gsl_vector_calloc(Y);
+// 	gsl_vector *ytest	= gsl_vector_calloc((Rnum+S)*Y);
+// 	gsl_vector *ytest2	= gsl_vector_calloc(Y);
 	
 //--Zufallszahlengenerator für Populationsgrößen----------------------------------------------------------------------------------------------------------
 
@@ -63,8 +63,8 @@ gsl_vector* EvolveNetwork(struct foodweb nicheweb)
 	gsl_rng *rng1;   									
 	gsl_rng_env_setup();   								
 	rng1_T = gsl_rng_default;   						// default random number generator (so called mt19937)
-	gsl_rng_default_seed = 0;							// default seed for rng
-	//gsl_rng_default_seed=((unsigned)time(NULL));		// random starting seed for rng
+	//gsl_rng_default_seed = 0;							// default seed for rng
+	gsl_rng_default_seed=((unsigned)time(NULL));		// random starting seed for rng
 	rng1 = gsl_rng_alloc(rng1_T);	
 
 //--Erstelle y[] mit Startwerten für die Speziespopulationsgrößen---------------------------------------------------------------------------------------
@@ -274,20 +274,20 @@ Er wird definiert über vier Größen
    
   }
   
-  gsl_vector_set_zero(ytest2);
-  gsl_vector_memcpy(ytest,yavg);
-  
-  for(i= 0; i<Y; i++)
-  {
-    int j;
-    for(j = Rnum ; j < (Rnum +S); j++ )
-    {
-      gsl_vector_set(ytest2, i, gsl_vector_get(ytest2,i) + gsl_vector_get(ytest,j+(Rnum+S)*i));
-    }
-  }
-  
-  printf("ytest2 ist %f\n",gsl_vector_get(ytest2,1));
-  printf("mLoss ist %f\n", metLossAv[1]);
+//   gsl_vector_set_zero(ytest2);
+//   gsl_vector_memcpy(ytest,yavg);
+//   
+//   for(i= 0; i<Y; i++)
+//   {
+//     int j;
+//     for(j = Rnum ; j < (Rnum +S); j++ )
+//     {
+//       gsl_vector_set(ytest2, i, gsl_vector_get(ytest2,i) + gsl_vector_get(ytest,j+(Rnum+S)*i));
+//     }
+//   }
+//   
+//   printf("ytest2 ist %f\n",gsl_vector_get(ytest2,1));
+//   printf("mLoss ist %f\n", metLossAv[1]);
   /* --> hier stimmt die Beziehnung von mLoss und biomasse noch */  
   
 //--Ergebnis zusammen fassen--------------------------------------------------------------------------------------------------------------------   
