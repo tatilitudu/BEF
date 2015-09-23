@@ -94,7 +94,20 @@ int main(int argc, char** argv)
 			printf("Bitte gültige Eingabe für Parameter machen!\nProgramm wird beendet.\n");		
 			return(0);		
 		 }
-	
+
+		 
+//--Zufallszahlengenerator initialisieren--------------------------------------------------------------------------------
+
+		const gsl_rng_type *rng1_T;											// ****
+		gsl_rng *rng1;   													// initialize random number generator
+		gsl_rng_env_setup();   												// ermöglicht Konsolenparameter
+		rng1_T = gsl_rng_default;   										// default random number generator (so called mt19937)
+		//gsl_rng_default_seed = 0;											// default seed for rng
+		gsl_rng_default_seed = ((unsigned)time(NULL));						// random starting seed for rng
+		rng1 = gsl_rng_alloc(rng1_T);
+		
+		
+		 
 //--Simulation---------------------------------------------------------------------------------------------------
 	nicheweb.alpha = nicheweb.alpha/100;
 	printf("alpha: %f\n", nicheweb.alpha);
@@ -113,7 +126,7 @@ int main(int argc, char** argv)
 	gsl_vector *meanOfDataSqu	= gsl_vector_calloc(67);
 	gsl_vector *meanSquOfData	= gsl_vector_calloc(67);
 	gsl_vector *meanSquOfDatatemp	= gsl_vector_calloc(67);
-	gsl_vector *standardDerivation	= gsl_vector_calloc(67);
+	gsl_vector *standardDeviation	= gsl_vector_calloc(67);
 	gsl_vector_set_zero(robustness);
 	gsl_vector_set_zero(meanSquOfData);
 
@@ -121,8 +134,8 @@ int main(int argc, char** argv)
 	 { 			
 		printf("\nStarte Durchlauf L = %i\n", i);
 			
-		nicheweb.network = SetNicheNetwork(nicheweb, res);
-		populationFIN	 = EvolveNetwork(nicheweb);
+		nicheweb.network = SetNicheNetwork(nicheweb, res, rng1, rng1_T);
+		populationFIN	 = EvolveNetwork(nicheweb, rng1, rng1_T);
 		//printf("funDiv: %f\n",gsl_vector_get(populationFIN, 5*nicheweb.Y*(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*nicheweb.Y+3));
 		// int j = 0;																					// Neues Netzwerk erzeugen
 		// for(j=0; j<len; j++)printf("Netzwerk %i: %f", j, gsl_vector_get(nicheweb.network, j));
@@ -153,11 +166,11 @@ int main(int argc, char** argv)
 	{
 	  gsl_vector_set(meanOfDataSqu, i, gsl_vector_get(meanOfDataSqu,i)/(L*L));
 	  gsl_vector_set(meanSquOfData, i, gsl_vector_get(meanSquOfData,i)/L);
-	  gsl_vector_set(standardDerivation, i, sqrt(gsl_vector_get(meanSquOfData,i)-gsl_vector_get(meanOfDataSqu,i)));
+	  gsl_vector_set(standardDeviation, i, sqrt(gsl_vector_get(meanSquOfData,i)-gsl_vector_get(meanOfDataSqu,i)));
 	}
 	
 	printf("S ist %f\n", gsl_vector_get(robustness,3));
-	printf("Standardabweichung von S ist %f\n", gsl_vector_get(standardDerivation,3));
+	printf("Standardabweichung von S ist %f\n", gsl_vector_get(standardDeviation,3));
 	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
 	printf("meanSquOfData ist %f\n", gsl_vector_get(meanSquOfData,3));
 	
@@ -214,7 +227,7 @@ int main(int argc, char** argv)
     
     for(i = 0 ; i<51; i++)
     {
-      fprintf(statistics,"%5.1f\t", gsl_vector_get(standardDerivation, i));
+      fprintf(statistics,"%5.3f\t", gsl_vector_get(standardDeviation, i));
     }
     
     for(i=51; i<62; i++)	//1mit2... Fixp1...7
@@ -224,7 +237,7 @@ int main(int argc, char** argv)
 
     for(i=62; i<67; i++)	//Rob2 -> regio 
     {
-        fprintf(statistics,"%5.3f\t", gsl_vector_get(standardDerivation, i));
+        fprintf(statistics,"%5.3f\t", gsl_vector_get(standardDeviation, i));
     }
     
     fprintf(statistics, "%d\t", 0);
@@ -241,6 +254,7 @@ int main(int argc, char** argv)
 	gsl_vector_free(fixpunkte);
 	gsl_vector_free(populationFIN);
 	gsl_vector_free(robustness);	
+	gsl_rng_free(rng1);
 	
 	return(0);
 

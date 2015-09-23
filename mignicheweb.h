@@ -7,7 +7,7 @@
 #include <gsl/gsl_rng.h>				
 
 
-gsl_vector* SetNicheNetwork(struct foodweb, struct resource);
+gsl_vector* SetNicheNetwork(struct foodweb, struct resource, gsl_rng*, const gsl_rng_type*);
 
 gsl_matrix* SetNicheValues(struct foodweb, double, gsl_rng*, const gsl_rng_type*);	
 												

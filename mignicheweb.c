@@ -29,7 +29,7 @@
 /*
 Diese Funktion erstellt ein Nahrungsnetz nach dem Nischenmodell für S Spezies auf Y Lebensräumen, die über die Kopplungskonstante d verbunden sind. T gibt die Topologie an (siehe SetTopology). Rnum ist die Anzahl der Ressource(n) und Rsize die Startgröße der Ressource(n). C beschreibt die Konnektivität des Netzes, wobei CRange die erlaubte max. Abweichung von C angibt.
 */
-gsl_vector *SetNicheNetwork(struct foodweb nicheweb, struct resource res){
+gsl_vector *SetNicheNetwork(struct foodweb nicheweb, struct resource res, gsl_rng* rng1, const gsl_rng_type* rng1_T){
 
 int len			= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*(nicheweb.S));	// Länge des Rückabewerts
 
@@ -47,14 +47,14 @@ double Rsize	= res.size;
 
 //--Zufallszahlengenerator initialisieren--------------------------------------------------------------------------------
 
-	const gsl_rng_type *rng1_T;											// ****
-	gsl_rng *rng1;   													// initialize random number generator
-	gsl_rng_env_setup();   												// ermöglicht Konsolenparameter
-	rng1_T = gsl_rng_default;   										// default random number generator (so called mt19937)
-	gsl_rng_default_seed = 0;											// default seed for rng
-	//gsl_rng_default_seed = ((unsigned)time(NULL));	// random starting seed for rng
-	//gsl_rng_default_seed = (rdtsc());
-	rng1 = gsl_rng_alloc(rng1_T);
+// 	const gsl_rng_type *rng1_T;											// ****
+// 	gsl_rng *rng1;   													// initialize random number generator
+// 	gsl_rng_env_setup();   												// ermöglicht Konsolenparameter
+// 	rng1_T = gsl_rng_default;   										// default random number generator (so called mt19937)
+// 	gsl_rng_default_seed = 0;											// default seed for rng
+// 	//gsl_rng_default_seed = ((unsigned)time(NULL));	// random starting seed for rng
+// 	//gsl_rng_default_seed = (rdtsc());
+// 	rng1 = gsl_rng_alloc(rng1_T);
 
 
 //--Alle benötigten Daten ausrechnen--------------------------------------------------------------------------------------

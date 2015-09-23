@@ -32,7 +32,7 @@
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
 
-gsl_vector* EvolveNetwork(struct foodweb nicheweb)
+gsl_vector* EvolveNetwork(struct foodweb nicheweb, gsl_rng* rng1, const gsl_rng_type* rng1_T)
 {	
 	struct foodweb *params = &nicheweb; 									// Damit Holling2 auf das foodweb zugreifen kann
 
@@ -59,13 +59,13 @@ gsl_vector* EvolveNetwork(struct foodweb nicheweb)
 	
 //--Zufallszahlengenerator für Populationsgrößen----------------------------------------------------------------------------------------------------------
 
-	const gsl_rng_type *rng1_T;							// Für zufällige Populationsgröße der Spezies
-	gsl_rng *rng1;   									
-	gsl_rng_env_setup();   								
-	rng1_T = gsl_rng_default;   						// default random number generator (so called mt19937)
-	//gsl_rng_default_seed = 0;							// default seed for rng
-	gsl_rng_default_seed=((unsigned)time(NULL));		// random starting seed for rng
-	rng1 = gsl_rng_alloc(rng1_T);	
+// 	const gsl_rng_type *rng1_T;							// Für zufällige Populationsgröße der Spezies
+// 	gsl_rng *rng1;   									
+// 	gsl_rng_env_setup();   								
+// 	rng1_T = gsl_rng_default;   						// default random number generator (so called mt19937)
+// 	//gsl_rng_default_seed = 0;							// default seed for rng
+// 	gsl_rng_default_seed=((unsigned)time(NULL));		// random starting seed for rng
+// 	rng1 = gsl_rng_alloc(rng1_T);	
 
 //--Erstelle y[] mit Startwerten für die Speziespopulationsgrößen---------------------------------------------------------------------------------------
 
@@ -348,7 +348,7 @@ Er wird definiert über vier Größen
 // 	gsl_vector_free(frivec);
 // 	gsl_vector_free(fcivec);
 
- 	gsl_rng_free(rng1);
+ 	//gsl_rng_free(rng1);
 
 	gsl_odeiv_control_free(c);
   	gsl_odeiv_evolve_free(e);
