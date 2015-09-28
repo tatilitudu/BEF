@@ -110,7 +110,9 @@ int main(int argc, char** argv)
 		 
 //--Simulation---------------------------------------------------------------------------------------------------
 	nicheweb.alpha = nicheweb.alpha/100;
+	res.size = res.size/10;
 	printf("alpha: %f\n", nicheweb.alpha);
+	printf("Resource size: %f\n", res.size);
 	float Brech = (float)nicheweb.S/6;
 
 	if(Brech>0) nicheweb.B = (int)(Brech + 0.5);
@@ -158,9 +160,9 @@ int main(int argc, char** argv)
 	
 	
 	gsl_vector_memcpy(meanOfDataSqu,robustness);
-	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	//printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
 	gsl_vector_mul(meanOfDataSqu,robustness);
-	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	//printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
 	
 	for(i =0; i<67; i++)
 	{
@@ -169,10 +171,10 @@ int main(int argc, char** argv)
 	  gsl_vector_set(standardDeviation, i, sqrt(gsl_vector_get(meanSquOfData,i)-gsl_vector_get(meanOfDataSqu,i)));
 	}
 	
-	printf("S ist %f\n", gsl_vector_get(robustness,3));
-	printf("Standardabweichung von S ist %f\n", gsl_vector_get(standardDeviation,3));
-	printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
-	printf("meanSquOfData ist %f\n", gsl_vector_get(meanSquOfData,3));
+	//printf("S ist %f\n", gsl_vector_get(robustness,3));
+	//printf("Standardabweichung von S ist %f\n", gsl_vector_get(standardDeviation,3));
+	//printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
+	//printf("meanSquOfData ist %f\n", gsl_vector_get(meanSquOfData,3));
 	
 //--Abspeichern in File-------------------------------------------------------------------------------------	
 	
