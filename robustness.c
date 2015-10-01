@@ -79,8 +79,8 @@ gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)	
       else if ((max!=0) && (min!=0)) 	// zu keinem Zeitpunkt ausgestorben
       {
 		if((((max-min)/(max+min))< 0.0001)	|| ((max-min)< 0.0001))	fix3++;		
-		if(((max-min)/(max+min)) < 0.0001) 							fix4++;
-		if((max-min)< 0.0001) 										fix5++;				// max Schwankung in Population kleiner als 0.0001
+		if(((max-min)/(max+min)) < 0.0001) 				fix4++;
+		if((max-min)< 0.0001) 						fix5++;				// max Schwankung in Population kleiner als 0.0001
 		if((((max-min)/(max+min))< 0.001)	|| ((max-min)< 0.001)) 	fix6++;
 		if((((max-min)/(max+min))< 0.00001)	|| ((max-min)< 0.00001))fix7++;
       }

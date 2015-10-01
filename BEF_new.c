@@ -401,7 +401,7 @@ double* functionalDiversity(struct foodweb nicheweb, const double y[], double ce
 //     k=0;
     for(j=0;j<N;j++)
     {
-      s=(j)*h-(2);
+      s=(j)*h-(10);
       M_prey=s;
       max = 0;
       //printf("M_prey : %f\n", M_prey);

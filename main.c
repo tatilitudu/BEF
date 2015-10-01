@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
 	gsl_vector* fixpunkte	= gsl_vector_calloc(9);
 
-	struct foodweb nicheweb	= {NULL, fixpunkte, 18, 3, 1, 5, 0, -7., 0.0, 0.6, 0.35, 0.5, 0.65, 6.0, 0};		// Reihenfolge: network, fxpkt, S, B, Rnum, Y, T, d, x, alpha, hand, beta, lambda, aij, M
+	struct foodweb nicheweb	= {NULL, fixpunkte, 18, 3, 1, 5, 0, -7., 0.0, 30, 0.35, 0.5, 0.65, 6.0, 0};		// Reihenfolge: network, fxpkt, S, B, Rnum, Y, T, d, x, alpha, hand, beta, lambda, aij, M
 	
 	struct resource res	= {500.0, 0.0};							// Resource: Größe, Wachstum
 	
