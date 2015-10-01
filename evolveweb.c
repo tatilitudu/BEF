@@ -49,7 +49,7 @@ gsl_vector* EvolveNetwork(struct foodweb nicheweb, gsl_rng* rng1, const gsl_rng_
 	int closezero= 1;			
 
 //-- Ergebnis Variablen-----------------------------------------------------------------------------------------------------------------------------------	
-	gsl_vector *result	= gsl_vector_calloc((Rnum+S)*Y*5 + 3 + S +4*Y); 				// y[Simulation], y0, ymax, ymin, yavg, fixp, TL
+	gsl_vector *result	= gsl_vector_calloc((Rnum+S)*Y*5 + 3 + S +5*Y); 				// y[Simulation], y0, ymax, ymin, yavg, fixp, TL
 	gsl_vector *y0		= gsl_vector_calloc((Rnum+S)*Y);						// Startwerte der Populationsgrößen
 	gsl_vector *ymax	= gsl_vector_calloc((Rnum+S)*Y);						// Maximalwerte nach t2
 	gsl_vector *ymin	= gsl_vector_calloc((Rnum+S)*Y);						// Minimalwerte nach t2
@@ -178,6 +178,7 @@ Er wird definiert über vier Größen
   double *resPredAv=(double *) calloc(Y,sizeof(double));
   double *intraPredAv=(double *) calloc(Y,sizeof(double));
   double *funcDiversityAv=(double *) calloc(Y,sizeof(double));
+  double *intraCompetitionAv=(double *) calloc(Y,sizeof(double));
 	
   gsl_vector *network 	= nicheweb.network;						// Inhalt: A+linksA+Y+linksY+Massen+Trophische_Level = (Rnum+S)²+1+Y²+1+(Rnum+S)+S
   
@@ -210,6 +211,7 @@ Er wird definiert über vier Größen
     double intraPred[Y];
     double resPred[Y];
     double funcDiversity[Y];
+    double intraCompetition[Y];
     for(i=1;i<S+1;i++)
     {
       //printf("y : %f\n",y[i]);
@@ -244,14 +246,17 @@ Er wird definiert über vier Größen
      intraguildPred(nicheweb, y, intraPred);
      predOnRes(nicheweb, y, resPred);
      functionalDiversity(nicheweb, y, center, intervall, funcDiversity);
+     intraspecificCompetition(nicheweb, y,intraCompetition);
     
     //printf("intraguildPred: %f\n",intraPred[0]);
     for(l=0;l<Y;l++)
     {
+      //printf("metLoss von patch %i ist %f\n",l,metLoss[l]);
       metLossAv[l]=((metLossAv[l]*(countsteps-1))+metLoss[l])/countsteps;
       resPredAv[l]=((resPredAv[l]*(countsteps-1))+resPred[l])/countsteps;
       intraPredAv[l]=((intraPredAv[l]*(countsteps-1))+intraPred[l])/countsteps;
       funcDiversityAv[l]=((funcDiversityAv[l]*(countsteps-1))+funcDiversity[l])/countsteps;
+      intraCompetitionAv[l]=((intraCompetitionAv[l]*(countsteps-1))+intraCompetition[l])/countsteps;
     }
     //printf("resPredAv: %f\n",resPredAv[0]);
     for(i=0; i<(Rnum+S)*Y; i++)
@@ -335,6 +340,9 @@ Er wird definiert über vier Größen
   
   for(l=0; l < Y; l++)
 	gsl_vector_set(result, 5*Y*(Rnum+S)+S+3+3*Y+l, funcDiversityAv[l]);
+  
+  for(l=0; l < Y; l++)
+	gsl_vector_set(result, 5*Y*(Rnum+S)+S+3+4*Y+l, intraCompetitionAv[l]);
   
   //printf("funcDiversityAv: %f\n",gsl_vector_get(result,5*Y*(Rnum+S)+S+3+3*Y+0));
 	free(y);

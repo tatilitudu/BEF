@@ -464,6 +464,63 @@ double* functionalDiversity(struct foodweb nicheweb, const double y[], double ce
 }
 
 
+double* intraspecificCompetition(struct foodweb nicheweb, const double y[], double* intraCompetition)
+{
+  int S 	 	= nicheweb.S;
+  int Y 	     	= nicheweb.Y;
+  int Rnum 		= nicheweb.Rnum;
+  double beta		= nicheweb.beta;
+  gsl_vector *network 	= nicheweb.network;	
 
-
-
+  int i,l;
+  
+  /* Massen rausholen */
+  gsl_vector_view M_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1, (Rnum+S));	// Massenvektor
+  gsl_vector *Mvec	   = &M_vec.vector;
+  
+  double ytemp[(Rnum+S)*Y];		// tempvector for populations and efforts
+  for(i=0;i<(Rnum+S)*Y;i++)
+    ytemp[i]=y[i];
+  
+  /* Auslesen von ytemp = y[]; sind Population */
+  gsl_vector_view yfd_vec=gsl_vector_view_array(ytemp,(Rnum+S)*Y);
+  gsl_vector *yfdvec=&yfd_vec.vector;				// populations and efforts for later use
+  
+  
+  /* Initialisierungen */
+  gsl_vector *svec=gsl_vector_calloc(Rnum+S);
+  gsl_vector *yveccom=gsl_vector_calloc(Rnum+S);
+  
+  
+  for(l= 0;l<Y;l++)
+  {
+    gsl_vector_set_zero(svec);
+    
+    
+    /* yfdvec enthält die Population */
+    gsl_vector_view y_vec=gsl_vector_subvector(yfdvec,(Rnum+S)*l,(Rnum+S));
+    gsl_vector *yvecc=&y_vec.vector;
+    
+    gsl_vector_memcpy(yveccom,yvecc);
+    
+    gsl_vector_memcpy(svec,Mvec);
+    gsl_vector_mul(svec,Mvec);				// s(i) = beta*(masse^(-0.25))²*y(i)
+    
+    gsl_vector_scale(svec,beta);		//s(i) = beta*masse^(-0.25)
+    
+    gsl_vector_set(yveccom,0,0);				// Resource kann nicht konkurrieren
+    gsl_vector_mul(svec,yveccom);				// s(i) = beta*(masse^(-0.25))²*y(i)
+    gsl_vector_mul(svec,yveccom);				// s(i) = beta*(masse^(-0.25))²*y(i)²
+    
+    //double intraComp = 0;
+    
+    
+    intraCompetition[l] = gsl_blas_dasum(svec);
+    //printf("intraCompetition ist %f\n",intraCompetition[l]);
+  }
+  
+  gsl_vector_free(svec);
+  
+  return 0;
+  
+}

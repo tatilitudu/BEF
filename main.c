@@ -121,14 +121,14 @@ int main(int argc, char** argv)
 	
 	
 	//int len	= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S);	// Länge des Rückabewerts
-
+	int len = 68;
 	gsl_vector *populationFIN 	= gsl_vector_calloc((nicheweb.Rnum + nicheweb.S)*(nicheweb.Y)*5 + (nicheweb.S) + 4*nicheweb.Y);				// Gleiche Länge wie Rückgabe von evolveNetwork
-	gsl_vector *robustness		= gsl_vector_calloc(67);
-	gsl_vector *robustnesstemp	= gsl_vector_calloc(67);
-	gsl_vector *meanOfDataSqu	= gsl_vector_calloc(67);
-	gsl_vector *meanSquOfData	= gsl_vector_calloc(67);
-	gsl_vector *meanSquOfDatatemp	= gsl_vector_calloc(67);
-	gsl_vector *standardDeviation	= gsl_vector_calloc(67);
+	gsl_vector *robustness		= gsl_vector_calloc(len);
+	gsl_vector *robustnesstemp	= gsl_vector_calloc(len);
+	gsl_vector *meanOfDataSqu	= gsl_vector_calloc(len);
+	gsl_vector *meanSquOfData	= gsl_vector_calloc(len);
+	gsl_vector *meanSquOfDatatemp	= gsl_vector_calloc(len);
+	gsl_vector *standardDeviation	= gsl_vector_calloc(len);
 	gsl_vector_set_zero(robustness);
 	gsl_vector_set_zero(meanSquOfData);
 
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 	gsl_vector_mul(meanOfDataSqu,robustness);
 	//printf("meanOfDataSqu ist %f\n", gsl_vector_get(meanOfDataSqu,3));
 	
-	for(i =0; i<67; i++)
+	for(i =0; i<len; i++)
 	{
 	  gsl_vector_set(meanOfDataSqu, i, gsl_vector_get(meanOfDataSqu,i)/(L*L));
 	  gsl_vector_set(meanSquOfData, i, gsl_vector_get(meanSquOfData,i)/L);
@@ -192,7 +192,7 @@ int main(int argc, char** argv)
     if(nicheweb.T==1&&nicheweb.Y==1&&nicheweb.d==0.0)
 
 */
-      fprintf(statistics,"RSize\tS\tB\tM\tx\tY\tdpow\tT\tRob\tPerlok\tPerges\tSi_ges\tSi_TL1\tSi_TL2\tSi_TL3\tSi_TL4\tSi_TL>4\tSf_ges\tSf_TL1\tSf_TL2\tSf_TL3\tSf_TL4\tSf_TL>4\tBi_ges\tBi_TL1\tBi_TL2\tBi_TL3\tBi_TL4\tBi_TL>4\tBf_ges\tBf_TL1\tBf_TL2\tBf_TL3\tBf_TL4\tBf_TL>4\tSh_ges\tSh_TL1\tSh_TL2\tSh_TL3\tSh_TL4\tSh_TL>4\tBh_ges\tBh_TL1\tBh_TL2\tBh_TL3\tBh_TL4\tBh_TL>4\tSs_ges\tSs_TL1\tSs_TL2\tSs_TL3\tSs_TL4\tSs_TL>4\tBs_ges\tBs_TL1\tBs_TL2\tBs_TL3\tBs_TL4\tBs_TL>4\t1mit2\t2mit3\t3mit1\tFixp0\tFixp1\tFixp2\tFixp3\tFixp4\tFixp5\tFixp6\tFixp7\tRob2\tmetLoss\trPred\tiPred\tfDiv\talpha\n");
+      fprintf(statistics,"RSize\tS\tB\tM\tx\tY\tdpow\tT\tRob\tPerlok\tPerges\tSi_ges\tSi_TL1\tSi_TL2\tSi_TL3\tSi_TL4\tSi_TL>4\tSf_ges\tSf_TL1\tSf_TL2\tSf_TL3\tSf_TL4\tSf_TL>4\tBi_ges\tBi_TL1\tBi_TL2\tBi_TL3\tBi_TL4\tBi_TL>4\tBf_ges\tBf_TL1\tBf_TL2\tBf_TL3\tBf_TL4\tBf_TL>4\tSh_ges\tSh_TL1\tSh_TL2\tSh_TL3\tSh_TL4\tSh_TL>4\tBh_ges\tBh_TL1\tBh_TL2\tBh_TL3\tBh_TL4\tBh_TL>4\tSs_ges\tSs_TL1\tSs_TL2\tSs_TL3\tSs_TL4\tSs_TL>4\tBs_ges\tBs_TL1\tBs_TL2\tBs_TL3\tBs_TL4\tBs_TL>4\t1mit2\t2mit3\t3mit1\tFixp0\tFixp1\tFixp2\tFixp3\tFixp4\tFixp5\tFixp6\tFixp7\tRob2\tmetLoss\trPred\tiPred\tfDiv\tiComp\talpha\n");
 
     fclose(statistics);
     statistics = fopen(aims,"a");												// fopen(*filename, a): schreibt am Ende der Datei weiter		
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 	fprintf(statistics,"%5.0f\t", gsl_vector_get(robustness, i));
       }
 
-    for(i=62; i<67; i++)	//Rob2 -> regio 
+    for(i=62; i<len; i++)	//Rob2 -> regio 
       {
 	gsl_vector_set(robustness, i, gsl_vector_get(robustness, i)/L);
         fprintf(statistics,"%5.3f\t", gsl_vector_get(robustness, i));
@@ -237,7 +237,7 @@ int main(int argc, char** argv)
 	fprintf(statistics,"n.b.\t");
     }
 
-    for(i=62; i<67; i++)	//Rob2 -> regio 
+    for(i=62; i<len; i++)	//Rob2 -> regio 
     {
         fprintf(statistics,"%5.3f\t", gsl_vector_get(standardDeviation, i));
     }

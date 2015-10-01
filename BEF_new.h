@@ -15,7 +15,9 @@ double* metabolicLoss(struct foodweb nicheweb, const double[], double*);
 
 double* functionalDiversity(struct foodweb nicheweb, const double[], double[], double[], double*);
 
-int kastenFunktion(double, double, double);		
+int kastenFunktion(double, double, double);	
+
+double* intraspecificCompetition(struct foodweb nicheweb, const double[], double*);
 
 
 #endif

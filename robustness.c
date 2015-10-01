@@ -23,7 +23,7 @@ Diese Funktion wertet ein zeitlich entwickeltes Nischennetz in Bezug auf Robusth
 
 gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)		//evolNetwork hat (Rnum+S)*Y*5+3+S Elemente
 {
-	gsl_vector *result = gsl_vector_calloc(67);
+	gsl_vector *result = gsl_vector_calloc(68);
 
 	printf("\nStarte Auswertung Robustness\n");
 
@@ -38,7 +38,8 @@ gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)	
   	gsl_vector_view metLoss	= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3, Y);	
 	gsl_vector_view resPred	= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3+Y, Y);	
 	gsl_vector_view intraPred= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3+2*Y, Y);
-  	gsl_vector_view funcDiversity= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3+3*Y, Y);	
+  	gsl_vector_view funcDiversity= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3+3*Y, Y);
+	gsl_vector_view intraCompetition= gsl_vector_subvector(evolNetwork, 5*Y*(Rnum+S)+S+3+4*Y, Y);
 
 	int i,l = 0;
 
@@ -109,6 +110,7 @@ gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)	
   double resPredAvAll=0;
   double intraPredAvAll=0;
   double funcDiversityAvAll=0;
+  double intraCompetitionAvAll = 0;
   
 //--Rob2 ausrechnen------------------------------------------------------------------------------------------------- 
   for(l=0; l<Y; l++)
@@ -219,6 +221,7 @@ gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)	
 		resPredAvAll += gsl_vector_get(&resPred.vector, l);
 		intraPredAvAll += gsl_vector_get(&intraPred.vector, l);
 		funcDiversityAvAll += gsl_vector_get(&funcDiversity.vector, l);
+		intraCompetitionAvAll += gsl_vector_get(&intraCompetition.vector,l);
 		  //printf("funcDiversity schleife: %f\n",funcDiversityAvAll);
 		//printf("metLossAvAll: %f\n",metLossAvAll);
 		//printf("resPredAvAll: %f\n",resPredAvAll);
@@ -348,7 +351,7 @@ gsl_vector *EvaluateRobustness(gsl_vector* evolNetwork, int Rnum, int S, int Y)	
   gsl_vector_set(result, 64, resPredAvAll/Y);
   gsl_vector_set(result, 65, intraPredAvAll/Y);
   gsl_vector_set(result, 66, funcDiversityAvAll/Y);
-
+  gsl_vector_set(result, 67, intraCompetitionAvAll/Y);
 
 //--free----------------------------------------------------------------------------------------------------------------------------  
 
