@@ -1,5 +1,5 @@
-#ifndef BEF_NEW_H
-#define BEF_NEW_H
+#ifndef BEF_NEW_ABTL2_H
+#define BEF_NEW_ABTL2_H
 
 #include "structs.h"
 #include <gsl/gsl_vector.h>

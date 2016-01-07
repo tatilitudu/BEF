@@ -22,7 +22,7 @@
 #include "structs.h"
 #include "holling2.h"
 #include "evolveweb.h"
-#include "BEF_new.h"
+#include "BEF_new_abTL2.h"
 
 #include <gsl/gsl_rng.h>					// random number generator functions
 #include <gsl/gsl_randist.h>				// random number distributions
@@ -182,6 +182,8 @@ Er wird definiert über vier Größen
 	
   gsl_vector *network 	= nicheweb.network;						// Inhalt: A+linksA+Y+linksY+Massen+Trophische_Level = (Rnum+S)²+1+Y²+1+(Rnum+S)+S
   
+  printf("Versuche auf Element %i zuzugreifen",((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S+S);
+  
   gsl_vector_view nvi_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S, S);	// Massenvektor
   gsl_vector *nvivec	   = &nvi_vec.vector;
   
@@ -191,10 +193,10 @@ Er wird definiert über vier Größen
   gsl_vector_view fci_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S+2*S, S);	// Massenvektor
   gsl_vector *fcivec	   = &fci_vec.vector;
   
-  for(i=0;i<(Rnum+S)*(Rnum+S);i++)
-  {
-    //printf("index %i von network ist: %f\n",i,gsl_vector_get(network,i));
-  }
+//   for(i=0;i<(Rnum+S)*(Rnum+S);i++)
+//   {
+//     //printf("index %i von network ist: %f\n",i,gsl_vector_get(network,i));
+//   }
   
   while(t < tend2)
   {

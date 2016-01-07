@@ -9,7 +9,7 @@
 
 gsl_vector* SetNicheNetwork(struct foodweb, struct resource, gsl_rng*, const gsl_rng_type*);
 
-gsl_matrix* SetNicheValues(struct foodweb, double, gsl_rng*, const gsl_rng_type*);	
+gsl_matrix* SetNicheValues(struct foodweb, double, gsl_rng*, const gsl_rng_type*, gsl_matrix*);	
 												
 gsl_matrix* SetFeedingMatrix(struct foodweb, gsl_matrix*, double, double);				
 

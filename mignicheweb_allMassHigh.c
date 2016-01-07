@@ -51,8 +51,8 @@ double Rsize	= res.size;
 // 	gsl_rng *rng1;   													// initialize random number generator
 // 	gsl_rng_env_setup();   												// ermöglicht Konsolenparameter
 // 	rng1_T = gsl_rng_default;   										// default random number generator (so called mt19937)
-// 	//gsl_rng_default_seed = 0;											// default seed for rng
-// 	gsl_rng_default_seed = ((unsigned)time(NULL));	// random starting seed for rng
+// 	gsl_rng_default_seed = 0;											// default seed for rng
+// 	//gsl_rng_default_seed = ((unsigned)time(NULL));	// random starting seed for rng
 // 	//gsl_rng_default_seed = (rdtsc());
 // 	rng1 = gsl_rng_alloc(rng1_T);
 
@@ -67,7 +67,7 @@ while(flag == 1)
 
 	flag = 0; 
 
-	SetNicheValues(nicheweb, C, rng1, rng1_T, NV);							// Nischenwerte		NOTIZ: In den gsl Objekten liegen floats!
+	NV 	= SetNicheValues(nicheweb, C, rng1, rng1_T);							// Nischenwerte		NOTIZ: In den gsl Objekten liegen floats!
 	A	= SetFeedingMatrix(nicheweb, NV, C, CRange);							// interaction matrix 
 
 	int links = CountLinks(A, (nicheweb.Rnum+nicheweb.S));	
@@ -134,12 +134,12 @@ Der Fressbereich wird mit einer Beta-Verteilung erwürfelt.
 Eine Spezies kann eine andere Spezies fressen, wenn der Nischenwert der Beute im Fressbereich des Räubers liegt.
 Rückgabewert: 3xS Matrix mit [0][S]: Nischenwert, [1][S]: Fressbereich, [2][S]: Fresszentrum.
 */
-gsl_matrix *SetNicheValues(struct foodweb nicheweb, double C, gsl_rng* rng1, const gsl_rng_type* rng_T, gsl_matrix* NV){
+gsl_matrix *SetNicheValues(struct foodweb nicheweb, double C, gsl_rng* rng1, const gsl_rng_type* rng_T){
 
 	int S = nicheweb.S;
 	//printf("\nStarte Berechnung der Nischenwerte für %i Spezies\n", S);
 
-	//gsl_matrix *NV	= gsl_matrix_calloc(3, nicheweb.S);	
+	gsl_matrix *NV	= gsl_matrix_calloc(3, nicheweb.S);	
  	gsl_vector *nv 	= gsl_vector_calloc(S); 
   
 	//printf("nischenwert allokation");
@@ -260,7 +260,7 @@ gsl_matrix* mas = gsl_matrix_calloc(2, Rnum + S);					// nullte Zeile Masse, ers
 
 int check		= 0; 
 int i, j 		= 0;
-int tlgesucht 	= 1;				// TL 0 darf es nicht geben, sonst keine Beute für diese Spezies
+int tlgesucht 		= 1;				// TL 0 darf es nicht geben, sonst keine Beute für diese Spezies
 
 //--TL = 0: Ressource--------------------------------------------------------------------------------------------------------
 
@@ -365,7 +365,7 @@ for(i=0; i< Rnum; i++) gsl_matrix_set(mas, 1, i, 0);	// Ressource hat TL = 0;
 		   else if(gsl_matrix_get(mas, 1, i)  > 1) 	gsl_matrix_set(mas, 0, i, gsl_matrix_get(NV, 0, i-Rnum));	// Sonst Masse = Nischenwert 
 		  }
 	  else{*/
-			gsl_matrix_set(mas, 0, i, pow(10, -0.25*(nicheweb.x*4*gsl_matrix_get(NV, 0, i-Rnum))));			// Allometrie
+			gsl_matrix_set(mas, 0, i, pow(10, -0.25*(nicheweb.x*4)));			// Allometrie
 		  //}
 
 	}
@@ -407,7 +407,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 		for(j=0; j< (S+Rnum); j++)
 	 	{
 			gsl_vector_set(result, i*(Rnum+S)+j, gsl_matrix_get(A, i, j));	// i*Res+S Zeilen = (Res+S)² Elemente aus A
-		    //printf("Index = %i, result %i gesetzt auf %f\n", index, i*(Rnum+S)+j, gsl_vector_get(result, i*(Rnum+S)+j));
+			//printf("Index = %i, result %i gesetzt auf %f\n", index, i*(Rnum+S)+j, gsl_vector_get(result, i*(Rnum+S)+j));
 			index++;
 	   	}
 		//printf("\n");
@@ -428,7 +428,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 			gsl_vector_set(result, index, gsl_matrix_get(D, i, j));	// i*(Res+S) + Y Zeilen = Y² Elemente aus A
 			//printf("Index = %i, result %i gesetzt auf %f\n", index, index, gsl_vector_get(result, index));
 			index++;
-	    }
+		}
 	  }
 
 	printf("\nMigrationsmatrix im Netzwerk\n");

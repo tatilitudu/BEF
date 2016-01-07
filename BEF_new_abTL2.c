@@ -33,6 +33,9 @@ double* predOnRes(struct foodweb nicheweb, const double y[], double* resPred)
   gsl_vector_view M_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1, (Rnum+S));	// Massenvektor
   gsl_vector *Mvec	   = &M_vec.vector;
 
+    /* TL rausholen */
+  gsl_vector_view TL_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S), (Rnum+S));	// Massenvektor
+  gsl_vector *TLvec	   = &TL_vec.vector;
   
   double ytemp[(Rnum+S)*Y];		// tempvector for populations and efforts
   for(i=0;i<(Rnum+S)*Y;i++)
@@ -52,23 +55,25 @@ double* predOnRes(struct foodweb nicheweb, const double y[], double* resPred)
   
   for(i=0;i<Rnum+S;i++)
   {
-    for(j=Rnum;j<Rnum+S;j++)
+    for(j=Rnum+1;j<Rnum+S;j++)
     {
       gsl_matrix_set(EAmat_new,i,j,0);
     }
+    gsl_matrix_set(EAmat_new,i,0,0);
   }
   
 
-  for(i=Rnum;i<Rnum+S;i++)
-  {
-    for(j=0;j<Rnum+S;j++)
-    {
-      if(gsl_matrix_get(EAmat_new,i,j)==1)
-      {
-	//printf("%3.1f\t", gsl_vector_get(network, (S+Rnum)*(S+Rnum)+1+(Y*Y)+1+(Rnum+S)+(j-Rnum)));
-      }
-    }
-  }
+//   for(i=0;i<Rnum+S;i++)
+//   {
+//     for(j=0;j<Rnum+S;j++)
+//     {
+//       if(gsl_matrix_get(EAmat_new,i,j)==1)
+//       {
+// 	printf("i ist %i und j ist %i\n",i,j);
+// 	//printf("%3.1f\t", gsl_vector_get(network, (S+Rnum)*(S+Rnum)+1+(Y*Y)+1+(Rnum+S)+(j-Rnum)));
+//       }
+//     }
+//   }
   
   /* Initialisierungen */
   gsl_matrix *AFgsl=gsl_matrix_calloc(Rnum+S, Rnum+S);		// matrix of foraging efforts
@@ -182,6 +187,10 @@ double* intraguildPred(struct foodweb nicheweb, const double y[], double* intraP
   gsl_vector_view M_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1, (Rnum+S));	// Massenvektor
   gsl_vector *Mvec	   = &M_vec.vector;				// massvector: M(i)=m^(-0.25)
   
+    /* TL rausholen */
+  gsl_vector_view TL_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S), (Rnum+S));	// Massenvektor
+  gsl_vector *TLvec	   = &TL_vec.vector;
+  
   double ytemp[(Rnum+S)*Y];		// tempvector for populations and efforts
   for(i=0;i<(Rnum+S)*Y;i++)
     ytemp[i]=y[i];
@@ -253,8 +262,19 @@ double* intraguildPred(struct foodweb nicheweb, const double y[], double* intraP
 
     
     /*  hand =  handling time */
-    /* Berechnung wie aus Paper */
-    gsl_vector_set(yvecint,0,0);
+    /* Berechnung wie aus Paper -- Hier Biomassenfluss von 2. TL zu höheren Level */
+    gsl_vector_set(yvecint,0,0);				// Resource 
+    for(i = 0; i< S; i++)
+    {
+      
+      if(gsl_vector_get(TLvec,i)<2)
+      {
+	//counter++;
+	//printf("TL ist %3.1f\t",gsl_vector_get(TLvec,i));
+	gsl_vector_set(yvecint,Rnum+i,0);				// 1. TL soll nicht berücksichtigt werden
+      }
+    }
+    //gsl_vector_set(yvecint,1,0);				// 1. TL soll nicht berücksichtigt werden
     //printf("y: %f\n",gsl_vector_get(yvecint,0));
     gsl_vector_memcpy(svec,yvecint);				// s(i)=y(i)
     gsl_vector_scale(svec, hand);				// s(i)=y(i)*h
@@ -296,6 +316,7 @@ double* intraguildPred(struct foodweb nicheweb, const double y[], double* intraP
   gsl_vector_free(rvec);
   gsl_vector_free(svec);
   gsl_vector_free(intraPredTemp);
+  gsl_vector_free(yvecint);
   
   return 0;
 }
@@ -317,6 +338,10 @@ double* metabolicLoss(struct foodweb nicheweb, const double y[], double* metLoss
   /* Massen rausholen */
   gsl_vector_view M_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1, (Rnum+S));	// Massenvektor
   gsl_vector *Mvec	   = &M_vec.vector;
+  
+    /* TL rausholen */
+  gsl_vector_view TL_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S), (Rnum+S));	// Massenvektor
+  gsl_vector *TLvec	   = &TL_vec.vector;
   
   double ytemp[(Rnum+S)*Y];		// tempvector for populations and efforts
   for(i=0;i<(Rnum+S)*Y;i++)
@@ -353,6 +378,17 @@ double* metabolicLoss(struct foodweb nicheweb, const double y[], double* metLoss
     gsl_vector_scale(svec,alpha);				// s(i)=alpha*masse^(-0.25) [svec=Respiration bzw. Mortalitaet]
     //printf("svec nachher: %f\n",gsl_vector_get(svec,3));
     gsl_vector_set(yvecmet,0,0);				// Resource kann nicht aussterben
+    for(i = 0; i< S; i++)
+    {
+      
+      if(gsl_vector_get(TLvec,i)<2)
+      {
+	//counter++;
+	//printf("TL ist %3.1f\t",gsl_vector_get(TLvec,i));
+	gsl_vector_set(yvecmet,Rnum+i,0);				// 1. TL soll nicht berücksichtigt werden
+      }
+    }
+
     gsl_vector_mul(svec,yvecmet);				// s(i) = alpha*masse^(-0.25)*y(i)
    
   
@@ -362,6 +398,7 @@ double* metabolicLoss(struct foodweb nicheweb, const double y[], double* metLoss
   }
   /* Speicher befreien */
   gsl_vector_free(svec);
+  gsl_vector_free(yvecmet);
   
   return 0;
 }
@@ -473,10 +510,14 @@ double* intraspecificCompetition(struct foodweb nicheweb, const double y[], doub
   gsl_vector *network 	= nicheweb.network;	
 
   int i,l;
-  
+  //int counter=0;
   /* Massen rausholen */
   gsl_vector_view M_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1, (Rnum+S));	// Massenvektor
   gsl_vector *Mvec	   = &M_vec.vector;
+  
+  /* TL rausholen */
+  gsl_vector_view TL_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S), (Rnum+S));	// Massenvektor
+  gsl_vector *TLvec	   = &TL_vec.vector;
   
   double ytemp[(Rnum+S)*Y];		// tempvector for populations and efforts
   for(i=0;i<(Rnum+S)*Y;i++)
@@ -509,6 +550,17 @@ double* intraspecificCompetition(struct foodweb nicheweb, const double y[], doub
     gsl_vector_scale(svec,beta);		//s(i) = beta*masse^(-0.25)
     
     gsl_vector_set(yveccom,0,0);				// Resource kann nicht konkurrieren
+    for(i = 0; i< S; i++)
+    {
+      
+      if(gsl_vector_get(TLvec,i)<2)
+      {
+	//counter++;
+	//printf("TL ist %3.1f\t",gsl_vector_get(TLvec,i));
+	gsl_vector_set(yveccom,Rnum+i,0);				// 1. TL soll nicht berücksichtigt werden
+      }
+    }
+    
     gsl_vector_mul(svec,yveccom);				// s(i) = beta*(masse^(-0.25))²*y(i)
     gsl_vector_mul(svec,yveccom);				// s(i) = beta*(masse^(-0.25))²*y(i)²
     
@@ -518,8 +570,10 @@ double* intraspecificCompetition(struct foodweb nicheweb, const double y[], doub
     intraCompetition[l] = gsl_blas_dasum(svec);
     //printf("intraCompetition ist %f\n",intraCompetition[l]);
   }
-  
+  //printf("counter ist %i\n",counter);
   gsl_vector_free(svec);
+  gsl_vector_free(yveccom);
+  //gsl_vector_free(Mvec);
   
   return 0;
   
