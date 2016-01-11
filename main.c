@@ -113,12 +113,12 @@ int main(int argc, char** argv)
 	res.size = res.size/10;
 	printf("alpha: %f\n", nicheweb.alpha);
 	printf("Resource size: %f\n", res.size);
-	float Brech = (float)nicheweb.S/6;
-
-	if(Brech>0) nicheweb.B = (int)(Brech + 0.5);
-	
-	else nicheweb.B =  (int)(Brech - 0.5);
-	
+// 	float Brech = (float)nicheweb.S/6;
+// 
+// 	if(Brech>0) nicheweb.B = (int)(Brech + 0.5);
+// 	
+// 	else nicheweb.B =  (int)(Brech - 0.5);
+	printf("B: %i\n", nicheweb.B);
 	
 	//int len	= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S);	// Länge des Rückabewerts
 	int len = 68;
@@ -132,11 +132,14 @@ int main(int argc, char** argv)
 	gsl_vector_set_zero(robustness);
 	gsl_vector_set_zero(meanSquOfData);
 
+	
+	gsl_matrix *D    = SetTopology(nicheweb.Y, nicheweb.T);						// migration matrix
+	
 	for(i = 0; i < L; i++)																							
 	 { 			
 		printf("\nStarte Durchlauf L = %i\n", i);
 			
-		nicheweb.network = SetNicheNetwork(nicheweb, res, rng1, rng1_T);
+		nicheweb.network = SetNicheNetwork(nicheweb, res, D, rng1, rng1_T);
 		populationFIN	 = EvolveNetwork(nicheweb, rng1, rng1_T);
 		//printf("funDiv: %f\n",gsl_vector_get(populationFIN, 5*nicheweb.Y*(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*nicheweb.Y+3));
 		// int j = 0;																					// Neues Netzwerk erzeugen
@@ -257,6 +260,7 @@ int main(int argc, char** argv)
 	gsl_vector_free(populationFIN);
 	gsl_vector_free(robustness);	
 	gsl_rng_free(rng1);
+	gsl_matrix_free(D);
 	
 	return(0);
 

@@ -29,7 +29,7 @@
 /*
 Diese Funktion erstellt ein Nahrungsnetz nach dem Nischenmodell für S Spezies auf Y Lebensräumen, die über die Kopplungskonstante d verbunden sind. T gibt die Topologie an (siehe SetTopology). Rnum ist die Anzahl der Ressource(n) und Rsize die Startgröße der Ressource(n). C beschreibt die Konnektivität des Netzes, wobei CRange die erlaubte max. Abweichung von C angibt.
 */
-gsl_vector *SetNicheNetwork(struct foodweb nicheweb, struct resource res, gsl_rng* rng1, const gsl_rng_type* rng1_T){
+gsl_vector *SetNicheNetwork(struct foodweb nicheweb, struct resource res, gsl_matrix* D, gsl_rng* rng1, const gsl_rng_type* rng1_T){
 
 int len			= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*(nicheweb.S));	// Länge des Rückabewerts
 
@@ -112,13 +112,13 @@ while(flag == 1)
 
 	for(i=0; i<nicheweb.S; i++) printf("Nischenwerte: %f\n", gsl_matrix_get(NV, 0, i));	
 	
-	gsl_matrix *D    = SetTopology(nicheweb.Y, nicheweb.T);								// migration matrix
+// 	gsl_matrix *D    = SetTopology(nicheweb.Y, nicheweb.T);						// migration matrix
 
  	result = LinkElements(nicheweb, NV, A, mas, D, Rsize, len);	
 		
  		 printf("\nNetzwerk erfolgreich erzeugt!\n");
 
-  gsl_matrix_free(D);
+  //gsl_matrix_free(D);
   gsl_matrix_free(NV);
   gsl_matrix_free(A);
   gsl_matrix_free(mas);
@@ -358,19 +358,23 @@ for(i=0; i< Rnum; i++) gsl_matrix_set(mas, 1, i, 0);	// Ressource hat TL = 0;
   	gsl_matrix_set(mas, 0, 0, Rsize);				// Nur für eine Ressource gültig! mas[0][0] Größe der Ressource
 
   for(i = Rnum; i< Rnum+S; i++)
-	{ 
+  { 
 	  /*if(nicheweb.x == 0.0){
 		  
 		   if(gsl_matrix_get(mas, 1, i) == 1)		gsl_matrix_set(mas, 0, i, 0);								// Basale Sp. Masse = 0
 		   else if(gsl_matrix_get(mas, 1, i)  > 1) 	gsl_matrix_set(mas, 0, i, gsl_matrix_get(NV, 0, i-Rnum));	// Sonst Masse = Nischenwert 
 		  }
 	  else{*/
-			gsl_matrix_set(mas, 0, i, pow(10, -0.25*(nicheweb.x*4*gsl_matrix_get(NV, 0, i-Rnum))));			// Allometrie
+
+	gsl_matrix_set(mas, 0, i, pow(10, -0.25*(nicheweb.x*4*gsl_matrix_get(NV, 0, i-Rnum))));			// Allometrie
 		  //}
-
+	if(gsl_matrix_get(mas,1,i)==1)
+	{
+	  gsl_matrix_set(mas,0,i,1);
 	}
+  }
 
-	return mas;
+  return mas;
 }
 //end SetMasses
 
