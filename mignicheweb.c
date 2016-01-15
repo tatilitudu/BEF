@@ -38,13 +38,14 @@ double CRange	= 0.01;
 
 double Rsize	= res.size;
 
-  gsl_vector *result		= gsl_vector_calloc(len);
+  //gsl_vector *result		= gsl_vector_calloc(len);
   gsl_matrix *NV		= gsl_matrix_calloc(3, nicheweb.S);
   gsl_matrix *A			= gsl_matrix_calloc((nicheweb.Rnum+nicheweb.S),(nicheweb.S+nicheweb.Rnum));
   gsl_matrix *mas		= gsl_matrix_calloc(2, (nicheweb.Rnum+nicheweb.S));
 
   printf("Erzeuge Nischennetz mit %i Spezies (davon gewünschte Anzahl basaler Spezies %i) auf %i Patches. Topologie-Marker %i.\n", nicheweb.S, nicheweb.B, nicheweb.Y, nicheweb.T);
 
+  
 //--Zufallszahlengenerator initialisieren--------------------------------------------------------------------------------
 
 // 	const gsl_rng_type *rng1_T;											// ****
@@ -68,11 +69,14 @@ while(flag == 1)
 	flag = 0; 
 
 	SetNicheValues(nicheweb, C, rng1, rng1_T, NV);							// Nischenwerte		NOTIZ: In den gsl Objekten liegen floats!
-	A	= SetFeedingMatrix(nicheweb, NV, C, CRange);							// interaction matrix 
+	gsl_matrix_set_zero(A);
+	A	= SetFeedingMatrix(nicheweb, NV, C, CRange,A);							// interaction matrix 
 
+	
+	
 	int links = CountLinks(A, (nicheweb.Rnum+nicheweb.S));	
-
-	//printf("Prüfe Linkanzahl\n");
+	printf("Prüfe Linkanzahl %i\n",links);
+	
 	double CON = (double)links/(((double)nicheweb.S)*((double)nicheweb.S)-1);
 
 	if(CON < (C-CRange) || CON > (C+CRange))
@@ -94,7 +98,7 @@ while(flag == 1)
 		continue;
 	}	
 
-	mas	= SetMasses(nicheweb, NV, A, Rsize);							// Massen + TL
+	mas = SetMasses(nicheweb, NV, A, Rsize,mas);							// Massen + TL
 
 	int TL0 = 0;
 	for(i = 0; i< nicheweb.S; i++){
@@ -114,16 +118,21 @@ while(flag == 1)
 	
 // 	gsl_matrix *D    = SetTopology(nicheweb.Y, nicheweb.T);						// migration matrix
 
- 	result = LinkElements(nicheweb, NV, A, mas, D, Rsize, len);	
-		
- 		 printf("\nNetzwerk erfolgreich erzeugt!\n");
+ 	LinkElements(nicheweb, NV, A, mas, D, Rsize, len);	
+// 	printf("Matrix A in SetNicheNetwork ist \n");
+// 	int j;
+// 	for(j= 0; j<nicheweb.S*nicheweb.S;j++)
+// 		{
+// 			printf("%f\t", gsl_vector_get(nicheweb.network,j));
+// 		}
+ 	printf("\nNetzwerk erfolgreich erzeugt!\n");
 
   //gsl_matrix_free(D);
   gsl_matrix_free(NV);
   gsl_matrix_free(A);
   gsl_matrix_free(mas);
 
-	return result;
+	return 0;
 }
 
 //######################################################################################################################################
@@ -186,7 +195,7 @@ Die Konnektivität (Anzahl vorhandener Links/ Anzahl möglicher Links) sollte in
 Für Spezies, die keine anderen Spezies fressen können, wird ein Link zur Ressource eingerichtet. Die Anzahl der basalen Spezies wird zum Programmstart vorgegeben (B).
 Gibt es eine abweichende Anzahl von basalen Spezies wird dies dem Benutzer mitgeteilt, damit Anpassungen gemacht werden können.
 */
-gsl_matrix *SetFeedingMatrix(struct foodweb nicheweb, gsl_matrix* NV, double C, double CRange){
+gsl_matrix *SetFeedingMatrix(struct foodweb nicheweb, gsl_matrix* NV, double C, double CRange, gsl_matrix* A){
 
 int S 	 = nicheweb.S;
 int Rnum = nicheweb.Rnum;
@@ -199,7 +208,7 @@ double fri 	= 0;
 double fci 	= 0;
 double nvj 	= 0;
 
- gsl_matrix* A = gsl_matrix_calloc((nicheweb.Rnum+nicheweb.S), (nicheweb.Rnum+nicheweb.S));
+ //gsl_matrix* A = gsl_matrix_calloc((nicheweb.Rnum+nicheweb.S), (nicheweb.Rnum+nicheweb.S));
 
 	//printf("Starte Berechnung der Fressmatrix...\n");
 			
@@ -220,7 +229,7 @@ double nvj 	= 0;
 //--Kannibalismus vermeiden----------------------------------------------------------------------------------------------------------	
   
 	  gsl_matrix_set(A, i+Rnum, i+Rnum, 0);											
-	 // printf("Kannibalismus vermeiden: A[%i][%i] gesetzt auf %f\n", i+Rnum, i+Rnum, gsl_matrix_get(A, i+Rnum, i+Rnum));	
+	 //printf("Kannibalismus vermeiden: A[%i][%i] gesetzt auf %f\n", i+Rnum, i+Rnum, gsl_matrix_get(A, i+Rnum, i+Rnum));	
 
 //--Basale Spezies finden-------------------------------------------------------------------------------------------------------------
 	  
@@ -247,14 +256,14 @@ double nvj 	= 0;
 	Dabei haben basale Spezies die Masse 0 und nicht basale Spezies erhalten ihren Nischenwert als Masse.
 	Die trophischen Level der Spezies werden in der zweiten Zeile der Matrix gespeichert. Basale Spezies haben TL 0.
 */
-gsl_matrix *SetMasses(struct foodweb nicheweb, gsl_matrix* NV, gsl_matrix* A, double Rsize){		//Ohne x für Allometrie
+gsl_matrix *SetMasses(struct foodweb nicheweb, gsl_matrix* NV, gsl_matrix* A, double Rsize, gsl_matrix* mas){		//Ohne x für Allometrie
 
 	//printf("SetMasses");
 
 int S 			= nicheweb.S;
 int Rnum		= nicheweb.Rnum;
 
-gsl_matrix* mas = gsl_matrix_calloc(2, Rnum + S);					// nullte Zeile Masse, erste Zeile trophisches Level	
+	
 	 
 //double x		= nicheweb.x;
 
@@ -401,7 +410,7 @@ int Rnum = nicheweb.Rnum;
 int i, j 	= 0;
 int index 	= 0;										// Läuft die Elemente von result ab
 
-gsl_vector* result = gsl_vector_calloc(len); 
+//gsl_vector* result = gsl_vector_calloc(len); 
 	
 //--Inhalt an die richtigen Stellen schreiben--------------------------------------------------------------------
 //--A und Links in A---------------------------------------------------------------------------------------------
@@ -410,8 +419,8 @@ gsl_vector* result = gsl_vector_calloc(len);
 	  {
 		for(j=0; j< (S+Rnum); j++)
 	 	{
-			gsl_vector_set(result, i*(Rnum+S)+j, gsl_matrix_get(A, i, j));	// i*Res+S Zeilen = (Res+S)² Elemente aus A
-		    //printf("Index = %i, result %i gesetzt auf %f\n", index, i*(Rnum+S)+j, gsl_vector_get(result, i*(Rnum+S)+j));
+			gsl_vector_set(nicheweb.network, i*(Rnum+S)+j, gsl_matrix_get(A, i, j));	// i*Res+S Zeilen = (Res+S)² Elemente aus A
+			  //printf("Index = %i, result %i gesetzt auf %f\n", index, i*(Rnum+S)+j, gsl_vector_get(nicheweb.network, i*(Rnum+S)+j));
 			index++;
 	   	}
 		//printf("\n");
@@ -419,7 +428,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 
 	printf("Fressmatrix im Netzwerk\n");
 
-	gsl_vector_set(result, index, CountLinks(A, Rnum+S));
+	gsl_vector_set(nicheweb.network, index, CountLinks(A, Rnum+S));
 	//printf("Index = %i, result %i gesetzt auf %f\n\n", index, index, gsl_vector_get(result, index+1));
 	index++;
 
@@ -429,7 +438,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 	  {
 		for(j=0; j< Y; j++)
 	 	{
-			gsl_vector_set(result, index, gsl_matrix_get(D, i, j));	// i*(Res+S) + Y Zeilen = Y² Elemente aus A
+			gsl_vector_set(nicheweb.network, index, gsl_matrix_get(D, i, j));	// i*(Res+S) + Y Zeilen = Y² Elemente aus A
 			//printf("Index = %i, result %i gesetzt auf %f\n", index, index, gsl_vector_get(result, index));
 			index++;
 	    }
@@ -437,19 +446,19 @@ gsl_vector* result = gsl_vector_calloc(len);
 
 	printf("\nMigrationsmatrix im Netzwerk\n");
 
-	gsl_vector_set(result, index, CountLinks(D, Y));		//Nochmal checken ob decmigcount wirklich Links in D ist -> JA
+	gsl_vector_set(nicheweb.network, index, CountLinks(D, Y));		//Nochmal checken ob decmigcount wirklich Links in D ist -> JA
 	//printf("result %i gesetzt auf %f\n\n", index, gsl_vector_get(result, index));
 	index++;
 
 //--Massen auch von Ressource---------------------------------------------------------------------------------------
 
-	gsl_vector_set(result, index, Rsize);
+	gsl_vector_set(nicheweb.network, index, Rsize);
 	index++;
 	
 	for(i=1; i< Rnum+S; i++)	
 	  {
-	 	gsl_vector_set(result, index, gsl_matrix_get(mas, 0, i));						// i*(Res+S) + Y Zeilen = Y² Elemente aus A
-		// printf("result %i gesetzt auf %f\n", index, gsl_vector_get(result, index));
+	 	gsl_vector_set(nicheweb.network, index, gsl_matrix_get(mas, 0, i));						// i*(Res+S) + Y Zeilen = Y² Elemente aus A
+		printf("result %i gesetzt auf %f\n", index, gsl_vector_get(nicheweb.network, index));
 		index++;
 	  }
 
@@ -461,8 +470,8 @@ gsl_vector* result = gsl_vector_calloc(len);
 
 	for(i=1; i<= S; i++)
 	  {
-		gsl_vector_set(result, index, gsl_matrix_get(mas, 1, i));
-		printf("%3.1f\t", gsl_vector_get(result, index));
+		gsl_vector_set(nicheweb.network, index, gsl_matrix_get(mas, 1, i));
+		printf("%3.1f\t", gsl_vector_get(nicheweb.network, index));
 		index++;
 	  }
 
@@ -474,7 +483,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 	  {
 	    for(j=0; j<S; j++)
 	    {
-		gsl_vector_set(result, index, gsl_matrix_get(NV, i, j));
+		gsl_vector_set(nicheweb.network, index, gsl_matrix_get(NV, i, j));
 		index++;
 	    }
 	  }
@@ -482,7 +491,7 @@ gsl_vector* result = gsl_vector_calloc(len);
 	printf("Nischenwerte im Netzwerk\n"); 
 	printf("\nNetzwerkkomponenten zusammengesetzt. Insgesamt %i Elemente\n\n", index);
 	
-return result;
+return 0;
  
 }// end LinkElements
 

@@ -95,7 +95,10 @@ int main(int argc, char** argv)
 			return(0);		
 		 }
 
+
 		 
+	int length	= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*(nicheweb.S));
+	nicheweb.network = gsl_vector_calloc(length);
 //--Zufallszahlengenerator initialisieren--------------------------------------------------------------------------------
 
 		const gsl_rng_type *rng1_T;											// ****
@@ -121,7 +124,7 @@ int main(int argc, char** argv)
 	printf("B: %i\n", nicheweb.B);
 	
 	//int len	= ((nicheweb.Rnum+nicheweb.S)*(nicheweb.S+nicheweb.Rnum)+1+nicheweb.Y*nicheweb.Y+1+(nicheweb.Rnum+nicheweb.S)+nicheweb.S);	// Länge des Rückabewerts
-	int len = 68;
+	int len = 68,j;
 	gsl_vector *populationFIN 	= gsl_vector_calloc((nicheweb.Rnum + nicheweb.S)*(nicheweb.Y)*5 + (nicheweb.S) + 4*nicheweb.Y);				// Gleiche Länge wie Rückgabe von evolveNetwork
 	gsl_vector *robustness		= gsl_vector_calloc(len);
 	gsl_vector *robustnesstemp	= gsl_vector_calloc(len);
@@ -139,7 +142,7 @@ int main(int argc, char** argv)
 	 { 			
 		printf("\nStarte Durchlauf L = %i\n", i);
 			
-		nicheweb.network = SetNicheNetwork(nicheweb, res, D, rng1, rng1_T);
+		SetNicheNetwork(nicheweb, res, D, rng1, rng1_T);
 		populationFIN	 = EvolveNetwork(nicheweb, rng1, rng1_T);
 		//printf("funDiv: %f\n",gsl_vector_get(populationFIN, 5*nicheweb.Y*(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*nicheweb.Y+3));
 		// int j = 0;																					// Neues Netzwerk erzeugen
