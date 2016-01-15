@@ -32,7 +32,7 @@
 #include <gsl/gsl_odeiv.h>
 #include <gsl/gsl_errno.h>
 
-gsl_vector* EvolveNetwork(struct foodweb nicheweb, gsl_rng* rng1, const gsl_rng_type* rng1_T)
+gsl_vector* EvolveNetwork(struct foodweb nicheweb, gsl_rng* rng1, const gsl_rng_type* rng1_T, gsl_vector* result)
 {	
 	struct foodweb *params = &nicheweb; 									// Damit Holling2 auf das foodweb zugreifen kann
 
@@ -49,11 +49,11 @@ gsl_vector* EvolveNetwork(struct foodweb nicheweb, gsl_rng* rng1, const gsl_rng_
 	int closezero= 1;			
 
 //-- Ergebnis Variablen-----------------------------------------------------------------------------------------------------------------------------------	
-	gsl_vector *result	= gsl_vector_calloc((Rnum+S)*Y*5 + 3 + S +5*Y); 				// y[Simulation], y0, ymax, ymin, yavg, fixp, TL
 	gsl_vector *y0		= gsl_vector_calloc((Rnum+S)*Y);						// Startwerte der Populationsgrößen
 	gsl_vector *ymax	= gsl_vector_calloc((Rnum+S)*Y);						// Maximalwerte nach t2
 	gsl_vector *ymin	= gsl_vector_calloc((Rnum+S)*Y);						// Minimalwerte nach t2
 	gsl_vector *yavg	= gsl_vector_calloc((Rnum+S)*Y);						// Durchschnittswert nach t2
+	gsl_vector *intervall_gsl = gsl_vector_calloc(S);
 // 	gsl_vector *ytest	= gsl_vector_calloc((Rnum+S)*Y);
 // 	gsl_vector *ytest2	= gsl_vector_calloc(Y);
 	
@@ -182,7 +182,7 @@ Er wird definiert über vier Größen
 	
   gsl_vector *network 	= nicheweb.network;						// Inhalt: A+linksA+Y+linksY+Massen+Trophische_Level = (Rnum+S)²+1+Y²+1+(Rnum+S)+S
   
-  printf("Versuche auf Element %i zuzugreifen",((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S+S);
+  //printf("Versuche auf Element %i zuzugreifen",((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S+S);
   
   gsl_vector_view nvi_vec  = gsl_vector_subvector(network, ((Rnum+S)*(Rnum+S))+1+(Y*Y)+1+(Rnum+S)+S, S);	// Massenvektor
   gsl_vector *nvivec	   = &nvi_vec.vector;
@@ -228,7 +228,7 @@ Er wird definiert über vier Größen
       
     double intervall[(Rnum+S)*(Y+1)];
     double center[(Rnum+S)*(Y+1)];
-    gsl_vector *intervall_gsl=gsl_vector_calloc(S);	
+    	
     
     gsl_vector_memcpy(intervall_gsl,nvivec);
     gsl_vector_mul(intervall_gsl,frivec);
@@ -349,11 +349,17 @@ Er wird definiert über vier Größen
   //printf("funcDiversityAv: %f\n",gsl_vector_get(result,5*Y*(Rnum+S)+S+3+3*Y+0));
 	free(y);
 //	free(params);
-
+	free(metLossAv);
+	free(resPredAv);
+	free(intraPredAv);
+	free(funcDiversityAv);
+	free(intraCompetitionAv);
+	
 	gsl_vector_free(y0);
 	gsl_vector_free(ymax);
 	gsl_vector_free(ymin);
 	gsl_vector_free(yavg);
+	gsl_vector_free(intervall_gsl);
 // 	gsl_vector_free(nvivec);
 // 	gsl_vector_free(frivec);
 // 	gsl_vector_free(fcivec);

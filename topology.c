@@ -18,11 +18,11 @@ Mögliche Verbindungsmuster sind
 #include <stdlib.h>					// standard
 #include <gsl/gsl_vector.h>
 
-gsl_matrix *SetTopology(int Y, int T){
+gsl_matrix *SetTopology(int Y, int T, gsl_matrix* D){
 
 int i = 0;
 
-gsl_matrix *D = gsl_matrix_calloc(Y,Y);
+
 
 	switch(T)
 	{

@@ -130,6 +130,7 @@ double* predOnRes(struct foodweb nicheweb, const double y[], double* resPred)
  gsl_vector_free(tvec);
  gsl_vector_free(rvec);
  gsl_vector_free(svec);
+ gsl_vector_free(resPredTemp);
  
  return 0;
  
@@ -249,6 +250,7 @@ double* intraguildPred(struct foodweb nicheweb, const double y[], double* intraP
   gsl_vector_free(tvec);
   gsl_vector_free(rvec);
   gsl_vector_free(svec);
+  gsl_vector_free(intraPredTemp);
   
   return 0;
 }

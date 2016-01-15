@@ -75,7 +75,7 @@ while(flag == 1)
 	
 	
 	int links = CountLinks(A, (nicheweb.Rnum+nicheweb.S));	
-	printf("Prüfe Linkanzahl %i\n",links);
+	//printf("Prüfe Linkanzahl %i\n",links);
 	
 	double CON = (double)links/(((double)nicheweb.S)*((double)nicheweb.S)-1);
 
@@ -458,7 +458,7 @@ int index 	= 0;										// Läuft die Elemente von result ab
 	for(i=1; i< Rnum+S; i++)	
 	  {
 	 	gsl_vector_set(nicheweb.network, index, gsl_matrix_get(mas, 0, i));						// i*(Res+S) + Y Zeilen = Y² Elemente aus A
-		printf("result %i gesetzt auf %f\n", index, gsl_vector_get(nicheweb.network, index));
+		//printf("result %i gesetzt auf %f\n", index, gsl_vector_get(nicheweb.network, index));
 		index++;
 	  }
 

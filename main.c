@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 		
 		
 		 
-//--Simulation---------------------------------------------------------------------------------------------------
+//--Initialisierungen--------------------------------------------------------------------------------------------------------------------------
 	nicheweb.alpha = nicheweb.alpha/100;
 	res.size = res.size/10;
 	printf("alpha: %f\n", nicheweb.alpha);
@@ -127,6 +127,10 @@ int main(int argc, char** argv)
 	int len = 68,j;
 	gsl_vector *populationFIN 	= gsl_vector_calloc((nicheweb.Rnum + nicheweb.S)*(nicheweb.Y)*5 + (nicheweb.S) + 4*nicheweb.Y);				// Gleiche Länge wie Rückgabe von evolveNetwork
 	gsl_vector *robustness		= gsl_vector_calloc(len);
+	gsl_vector *resultEvolveWeb	= gsl_vector_calloc((nicheweb.Rnum+nicheweb.S)*nicheweb.Y*5 + 3 + nicheweb.S +5*nicheweb.Y); 				// y[Simulation], y0, ymax, ymin, yavg, fixp, TL
+	gsl_vector *resultRobustness	= gsl_vector_calloc(68);
+	gsl_matrix *D			= gsl_matrix_calloc(nicheweb.Y,nicheweb.Y);
+	
 	gsl_vector *robustnesstemp	= gsl_vector_calloc(len);
 	gsl_vector *meanOfDataSqu	= gsl_vector_calloc(len);
 	gsl_vector *meanSquOfData	= gsl_vector_calloc(len);
@@ -135,21 +139,22 @@ int main(int argc, char** argv)
 	gsl_vector_set_zero(robustness);
 	gsl_vector_set_zero(meanSquOfData);
 
-	
-	gsl_matrix *D    = SetTopology(nicheweb.Y, nicheweb.T);						// migration matrix
+//--Simulation---------------------------------------------------------------------------------------------------	
+	D    = SetTopology(nicheweb.Y, nicheweb.T, D);						// migration matrix
 	
 	for(i = 0; i < L; i++)																							
 	 { 			
 		printf("\nStarte Durchlauf L = %i\n", i);
 			
 		SetNicheNetwork(nicheweb, res, D, rng1, rng1_T);
-		populationFIN	 = EvolveNetwork(nicheweb, rng1, rng1_T);
+		gsl_vector_set_zero(resultEvolveWeb);
+		populationFIN	 = EvolveNetwork(nicheweb, rng1, rng1_T,resultEvolveWeb);
 		//printf("funDiv: %f\n",gsl_vector_get(populationFIN, 5*nicheweb.Y*(nicheweb.Rnum+nicheweb.S)+nicheweb.S+3*nicheweb.Y+3));
 		// int j = 0;																					// Neues Netzwerk erzeugen
 		// for(j=0; j<len; j++)printf("Netzwerk %i: %f", j, gsl_vector_get(nicheweb.network, j));
  	    // gsl_vector_add(populationFIN, EvolveNetwork(nicheweb));		
-												
-		gsl_vector_memcpy(robustnesstemp, EvaluateRobustness(populationFIN, nicheweb.Rnum, nicheweb.S, nicheweb.Y));	// Robustness Analyse
+		gsl_vector_set_zero(resultRobustness);
+		gsl_vector_memcpy(robustnesstemp, EvaluateRobustness(populationFIN, nicheweb.Rnum, nicheweb.S, nicheweb.Y, resultRobustness));	// Robustness Analyse
 
 		gsl_vector_add(robustness,robustnesstemp);
 		

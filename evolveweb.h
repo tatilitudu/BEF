@@ -10,6 +10,6 @@
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_vector.h>
 
-gsl_vector* EvolveNetwork(struct foodweb, gsl_rng*, const gsl_rng_type*);
+gsl_vector* EvolveNetwork(struct foodweb, gsl_rng*, const gsl_rng_type*, gsl_vector*);
 
 #endif
