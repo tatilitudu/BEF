@@ -61,7 +61,7 @@ double Rsize	= res.size;
 //--Alle benötigten Daten ausrechnen--------------------------------------------------------------------------------------
 
 int flag = 1;
-int i 	 = 0;
+int i,k,j 	 = 0;
 
 while(flag == 1)
 {
@@ -113,6 +113,14 @@ while(flag == 1)
 	}	
 
 }
+	for(k = 0; k < nicheweb.Rnum+nicheweb.S;k++)
+	{
+	  for(j = 0; j< nicheweb.Rnum+nicheweb.S; j++)
+	  {
+	    printf("%f\t",gsl_matrix_get(A,k,j));
+	  }
+	  printf("\n");
+	}
 
 	for(i=0; i<nicheweb.S; i++) printf("Nischenwerte: %f\n", gsl_matrix_get(NV, 0, i));	
 	
@@ -284,7 +292,7 @@ for(i=0; i< Rnum; i++) gsl_matrix_set(mas, 1, i, 0);	// Ressource hat TL = 0;
 		  if(gsl_matrix_get(A, i, j)!=0)
 		  {
 			gsl_matrix_set(mas, 1, i, 1);					
-			//printf("Spezies %i hat trophisches Level 1\n", i-Rnum);
+			printf("Spezies %i hat trophisches Level 1\n", i);
 		  }
 		}
 	}
@@ -309,11 +317,11 @@ for(i=0; i< Rnum; i++) gsl_matrix_set(mas, 1, i, 0);	// Ressource hat TL = 0;
 
 				  //Spezies hat trophisches Level, das genau 1 kleiner ist und ist auch Beute laut A
 
-				  if((gsl_matrix_get(mas, 1, j) == (tlgesucht-1)) && (gsl_matrix_get(A, i-Rnum, j-Rnum)!=0))		
+				  if((gsl_matrix_get(mas, 1, j) == (tlgesucht-1)) && (gsl_matrix_get(A, i, j)==1))		
 					  
 					  {
 						gsl_matrix_set(mas, 1, i, tlgesucht);
-						//printf("Spezies %i hat trophisches Level %i\n", i-Rnum, tlgesucht);
+						printf("Spezies %i hat trophisches Level %i und frisst von Spezies %i mit %f \n", i, tlgesucht,j, gsl_matrix_get(A, i, j));
 						check++;  
 					  }
 				}
